@@ -629,12 +629,6 @@ bool LiveVariables::runOnMachineFunction(MachineFunction &mf) {
   PHIVarInfo.resize(MF->getNumBlockIDs());
   PHIJoins.clear();
 
-  // FIXME: LiveIntervals will be updated to remove its dependence on
-  // LiveVariables to improve compilation time and eliminate bizarre pass
-  // dependencies. Until then, we can't change much in -O0.
-  if (!MRI->isSSA())
-    report_fatal_error("regalloc=... not currently supported with -O0");
-
   analyzePHINodes(mf);
 
   // Calculate live variable information in depth first order on the CFG of the
