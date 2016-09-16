@@ -41,7 +41,14 @@ Value *llvm::MapValue(const Value *V, ValueToValueMapTy &VM, RemapFlags Flags,
     if (Value *NewV =
             Materializer->materializeDeclFor(const_cast<Value *>(V))) {
       VM[V] = NewV;
-      if (auto *NewGV = dyn_cast<GlobalValue>(NewV))
+
+      Value *Operand = NewV;
+      ConstantExpr *Cast = nullptr;
+      while ((Cast = dyn_cast<ConstantExpr>(Operand))
+             && Cast->getNumOperands() == 1)
+        Operand = Cast->getOperand(0);
+
+      if (auto *NewGV = dyn_cast<GlobalValue>(Operand))
         Materializer->materializeInitFor(
             NewGV, const_cast<GlobalValue *>(cast<GlobalValue>(V)));
       return NewV;
